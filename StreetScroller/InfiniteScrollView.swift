@@ -65,12 +65,12 @@ class InfiniteScrollView: UIScrollView, UIScrollViewDelegate {
     required init?(coder aDecoder: NSCoder) {
         labelContainerView = UIView()
         super.init(coder: aDecoder)
-        self.contentSize = CGSizeMake(5000, self.frame.size.height)
+        self.contentSize = CGSize(width: 5000, height: self.frame.size.height)
         
-        self.labelContainerView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height/2)
+        self.labelContainerView.frame = CGRect(x: 0, y: 0, width: self.contentSize.width, height: self.contentSize.height/2)
         self.addSubview(self.labelContainerView)
         
-        self.labelContainerView.userInteractionEnabled = false
+        self.labelContainerView.isUserInteractionEnabled = false
         
         // hide horizontal scroll indicator so our recentering trick is not revealed
         self.showsHorizontalScrollIndicator = false
@@ -87,13 +87,13 @@ class InfiniteScrollView: UIScrollView, UIScrollViewDelegate {
         let distanceFromCenter = abs(currentOffset.x - centerOffsetX)
         
         if distanceFromCenter > (contentWidth / 4.0) {
-            self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y)
+            self.contentOffset = CGPoint(x: centerOffsetX, y: currentOffset.y)
             
             // move content by the same amount so it appears to stay still
             for label in self.visibleLabels {
-                var center = self.labelContainerView.convertPoint(label.center, toView: self)
+                var center = self.labelContainerView.convert(label.center, to: self)
                 center.x += (centerOffsetX - currentOffset.x)
-                label.center = self.convertPoint(center, toView: self.labelContainerView)
+                label.center = self.convert(center, to: self.labelContainerView)
             }
         }
     }
@@ -104,9 +104,9 @@ class InfiniteScrollView: UIScrollView, UIScrollViewDelegate {
         self.recenterIfNecessary()
         
         // tile content in visible bounds
-        let visibleBounds = self.convertRect(self.bounds, toView: self.labelContainerView)
-        let minimumVisibleX = CGRectGetMinX(visibleBounds)
-        let maximumVisibleX = CGRectGetMaxX(visibleBounds)
+        let visibleBounds = self.convert(self.bounds, to: self.labelContainerView)
+        let minimumVisibleX = visibleBounds.minX
+        let maximumVisibleX = visibleBounds.maxX
         
         self.tileLabelsFromMinX(minimumVisibleX, toMaxX: maximumVisibleX)
     }
@@ -115,7 +115,7 @@ class InfiniteScrollView: UIScrollView, UIScrollViewDelegate {
     //MARK: - Label Tiling
     
     private func insertLabel() -> UILabel {
-        let label = UILabel(frame: CGRectMake(0, 0, 500, 80))
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 500, height: 80))
         label.numberOfLines = 3
         label.text = "1024 Block Street\nShaffer, CA\n95014"
         self.labelContainerView.addSubview(label)
@@ -123,7 +123,7 @@ class InfiniteScrollView: UIScrollView, UIScrollViewDelegate {
         return label
     }
     
-    private func placeNewLabelOnRight(rightEdge: CGFloat) -> CGFloat {
+    private func placeNewLabelOnRight(_ rightEdge: CGFloat) -> CGFloat {
         let label = self.insertLabel()
         self.visibleLabels.append(label) // add rightmost label at the end of the array
         
@@ -132,54 +132,52 @@ class InfiniteScrollView: UIScrollView, UIScrollViewDelegate {
         frame.origin.y = self.labelContainerView.bounds.size.height - frame.size.height
         label.frame = frame
         
-        return CGRectGetMaxX(frame)
+        return frame.maxX
     }
     
-    private func placeNewLabelOnLeft(leftEdge: CGFloat) -> CGFloat {
+    private func placeNewLabelOnLeft(_ leftEdge: CGFloat) -> CGFloat {
         let label = self.insertLabel()
-        self.visibleLabels.insert(label, atIndex: 0) // add leftmost label at the beginning of the array
+        self.visibleLabels.insert(label, at: 0) // add leftmost label at the beginning of the array
         
         var frame = label.frame
         frame.origin.x = leftEdge - frame.size.width
         frame.origin.y = self.labelContainerView.bounds.size.height - frame.size.height
         label.frame = frame
         
-        return CGRectGetMinX(frame)
+        return frame.minX
     }
     
-    private func tileLabelsFromMinX(minimumVisibleX: CGFloat, toMaxX maximumVisibleX: CGFloat) {
+    private func tileLabelsFromMinX(_ minimumVisibleX: CGFloat, toMaxX maximumVisibleX: CGFloat) {
         // the upcoming tiling logic depends on there already being at least one label in the visibleLabels array, so
         // to kick off the tiling we need to make sure there's at least one label
         if self.visibleLabels.isEmpty {
-            self.placeNewLabelOnRight(minimumVisibleX)
+            _ = self.placeNewLabelOnRight(minimumVisibleX)
         }
         
         // add labels that are missing on right side
         let lastLabel = self.visibleLabels.last!
-        var rightEdge = CGRectGetMaxX(lastLabel.frame)
+        var rightEdge = lastLabel.frame.maxX
         while rightEdge < maximumVisibleX {
             rightEdge = self.placeNewLabelOnRight(rightEdge)
         }
         
         // add labels that are missing on left side
         let firstLabel = self.visibleLabels[0]
-        var leftEdge = CGRectGetMinX(firstLabel.frame)
+        var leftEdge = firstLabel.frame.minX
         while leftEdge > minimumVisibleX {
             leftEdge = self.placeNewLabelOnLeft(leftEdge)
         }
         
         // remove labels that have fallen off right edge
-        while let lastLabel = self.visibleLabels.last
-            where lastLabel.frame.origin.x > maximumVisibleX {
-                lastLabel.removeFromSuperview()
-                self.visibleLabels.removeLast()
+        while let lastLabel = self.visibleLabels.last, lastLabel.frame.origin.x > maximumVisibleX {
+            lastLabel.removeFromSuperview()
+            self.visibleLabels.removeLast()
         }
         
         // remove labels that have fallen off left edge
-        while let firstLabel = self.visibleLabels.first
-            where CGRectGetMaxX(firstLabel.frame) < minimumVisibleX {
-                firstLabel.removeFromSuperview()
-                self.visibleLabels.removeFirst()
+        while let firstLabel = self.visibleLabels.first, firstLabel.frame.maxX < minimumVisibleX {
+            firstLabel.removeFromSuperview()
+            self.visibleLabels.removeFirst()
         }
     }
     

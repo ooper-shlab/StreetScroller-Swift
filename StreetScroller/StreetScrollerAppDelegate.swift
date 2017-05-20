@@ -65,10 +65,10 @@ class StreetScrollerAppDelegate: UIResponder, UIApplicationDelegate {
     
     //MARK: -
     
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
+        window = UIWindow(frame: UIScreen.main.bounds)
+        if UIDevice.current.userInterfaceIdiom == .phone {
             viewController = StreetScrollerViewController(nibName: "StreetScrollerViewController_iPhone", bundle: nil)
         } else {
             viewController = StreetScrollerViewController(nibName: "StreetScrollerViewController_iPad", bundle: nil)

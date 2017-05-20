@@ -63,19 +63,19 @@ class StreetScrollerViewController: UIViewController {
         // do any additional setup after loading the view, typically from a nib
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
     }
     
-    override func viewDidDisappear(animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
     }
     
@@ -84,11 +84,11 @@ class StreetScrollerViewController: UIViewController {
     //    // Return YES for supported orientations
     //    return (interfaceOrientation == UIInterfaceOrientationPortrait);
     //}
-    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
-        return .Portrait
+    override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
+        return .portrait
     }
-    override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
-        return .Portrait
+    override var preferredInterfaceOrientationForPresentation : UIInterfaceOrientation {
+        return .portrait
     }
     
 }
